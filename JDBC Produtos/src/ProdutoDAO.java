@@ -38,13 +38,75 @@ public class ProdutoDAO{
             ResultSet rs = stmt.executeQuery();
 
             while(rs.next()){
-                System.out.println("Id - "+rs.getInt(1)+" -- Nome - "+rs.getString(2)+
+                System.out.println("Código - "+rs.getInt(1)+" -- Nome - "+rs.getString(2)+
                         " -- Preço - "+rs.getDouble(3)+" -- Estoque - "+
                         rs.getInt(4)+" -- Data de Lançamento - "+rs.getObject(5, LocalDate.class).format(formatoData));
 
             }
 
         }catch (SQLException e){
+            throw new RuntimeException(e);
+
+        }
+
+    }
+
+    public void removerProduto(int idProduto){
+        FabricaDeConexoes fc = FabricaDeConexoes.obterInstancia();
+        try(Connection conn = fc.getConnection()){
+            String sql = """
+                    Select * from produto where idProduto = ?
+                    """;
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1,idProduto);
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()){
+                String delete = """
+                        delete from produto where idProduto = ?
+                        """;
+                stmt = conn.prepareStatement(delete);
+                stmt.setInt(1,idProduto);
+                stmt.execute();
+
+            }else{
+                System.out.println("Produto de código "+idProduto+" não foi encontrado.");
+
+            }
+
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+
+        }
+
+    }
+
+    public void alterarEstoque(int idProduto,int novaQuantidade){
+        FabricaDeConexoes fc = FabricaDeConexoes.obterInstancia();
+        try(Connection conn = fc.getConnection()){
+            String sql = """
+                    select estoqueProduto from produto where idProduto = ?
+                    """;
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1,idProduto);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String altera = """
+                        update produto set estoqueProduto = ? where idProduto = ?
+                        """;
+
+                stmt = conn.prepareStatement(altera);
+                stmt.setInt(1,novaQuantidade);
+                stmt.setInt(2,idProduto);
+                stmt.execute();
+
+            }else{
+                System.out.println("Produto com código "+idProduto+" não foi encontrado.");
+            }
+        }catch(SQLException e){
             throw new RuntimeException(e);
 
         }
