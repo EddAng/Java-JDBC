@@ -20,8 +20,12 @@ public class Main {
                     String nome = scan.next();
                     System.out.print("Informe o preço do produto: ");
                     double preco = scan.nextDouble();
+                    System.out.println("Informe a quantidade de estoque que o produto possui: ");
+                    int qntd = scan.nextInt();
+
                     produto.setNome(nome);
                     produto.setPreco(preco);
+                    produto.setQntd(qntd);
 
                     dao.cadastrarProduto(produto);
                     break;
